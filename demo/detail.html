@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!--HTML5 doctype-->
+<html>
+
+<head>
+
+    <title>互联网信息服务平台</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=0.1,maxmum-scale=10.0">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="stylesheet" type="text/css" href="build/icons.css" />
+    <link rel="stylesheet" type="text/css" href="build/af.ui.css" />
+    <link rel="stylesheet" type="text/css" href="build/mystyle.css" />
+     <script type="text/javascript" charset="utf-8" src="js/libs/jquery.min.js"></script>
+    	<script type="text/javascript" src="js/libs/iscroll-probe.js"></script>
+	<script type="text/javascript" src="js/libs/fastclick.js"></script>
+    <!--<script type="text/javascript" src="build/appframework.ui.js"></script>-->
+    <script type="text/javascript" charset="utf-8" src="src/af.shim.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.ui.js"></script>
+    <script src="src/af.desktopBrowsers.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.actionsheet.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.animation.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.touchEvents.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.popup.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.drawer.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.toast.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.animateheader.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.splashscreen.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.swipereveal.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.lockscreen.js"></script>
+    
+    <script>
+    $.afui.useOSThemes=false;
+    $.afui.loadDefaultHash=true;
+    $.afui.autoLaunch=false;
+
+    //check search
+    var search=document.location.search.toLowerCase().replace("?","");
+    if(search.length>0)
+    {
+
+       $.afui.useOSThemes=true;
+        if(search=="win8")
+            $.os.ie=true;
+        else if(search=="firefox")
+            $.os.fennec="true"
+        $.afui.ready(function(){
+            $(document.body).get(0).className=(search);
+        });
+    }
+
+    $(document).ready(function(){
+		loadurl();
+        $.afui.launch();
+    });
+
+    //if($.os.ios)
+        $.afui.animateHeader(true);
+
+    </script>
+   <Script language="javascript">
+	function loadurl() {
+  
+ 	 var url = location.search; //获取url中"?"符后的字串
+   	if (url.indexOf("?") != -1) {
+      var str = url.substr(1);
+      strs = str.split("&");
+/*      for(var i = 0; i < strs.length; i ++) {
+         theRequest[strs[i].split("=")[0]]=(strs[i].split("=")[1]);
+      }*/
+	  $('#mydetail').append('<iframe frameborder="no" height=100% name="detail" src="'+strs[0].split("=")[1]+'" width=100% security="restricted" sandbox=""></iframe>');
+   }
+}
+</Script>
+</head>
+
+<body>
+<div id="afui" class="">
+    <div class="view" id="mainview">
+        <header>
+        <a class="backButton" href="index.html" data-ignore="True" style="float:left"></a>
+        <a class="menuButton"  style="float:right" data-left-menu="leftMenu" onclick="$.afui.drawer.show('#left','left','reveal')"></a>
+        <h1 id="pageTitle">详情页</h1>
+    	</header>
+        <!--内容------------------------------------------------------------------------------------------- -->
+        <div class="pages">
+            <div data-left-drawer="left" class="panel" id="mydetail"  data-selected="true">
+   			 </div>     
+        </div>
+        <!--侧边栏------------------------------------------------------------------------------------------- -->
+		<nav id="left"  style="z-index:5" data-include="partials/leftnav.html"></nav>
+        
+    </div>
+    </div>
+</body>
+
+</html>

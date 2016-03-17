@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<!--HTML5 doctype-->
+<html>
+
+<head>
+
+    <title>互联网信息服务平台</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, minimal-ui">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="stylesheet" type="text/css" href="build/icons.css" />
+    <link rel="stylesheet" type="text/css" href="build/af.ui.css" />
+    <link rel="stylesheet" type="text/css" href="build/mystyle.css" />
+     <script type="text/javascript" charset="utf-8" src="js/libs/jquery.min.js"></script>
+    	<script type="text/javascript" src="js/libs/iscroll-probe.js"></script>
+	<script type="text/javascript" src="js/libs/fastclick.js"></script>
+    <!--<script type="text/javascript" src="build/appframework.ui.js"></script>-->
+    <script type="text/javascript" charset="utf-8" src="src/af.shim.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.ui.js"></script>
+    <script src="src/af.desktopBrowsers.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.actionsheet.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.animation.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.touchEvents.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.popup.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.drawer.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.toast.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.animateheader.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.splashscreen.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.swipereveal.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.lockscreen.js"></script>
+    
+    <script>
+    $.afui.useOSThemes=false;
+    $.afui.loadDefaultHash=true;
+    $.afui.autoLaunch=false;
+
+    //check search
+    var search=document.location.search.toLowerCase().replace("?","");
+    if(search.length>0)
+    {
+
+       $.afui.useOSThemes=true;
+        if(search=="win8")
+            $.os.ie=true;
+        else if(search=="firefox")
+            $.os.fennec="true"
+        $.afui.ready(function(){
+            $(document.body).get(0).className=(search);
+        });
+    }
+
+    $(document).ready(function(){
+        $.afui.launch();
+    });
+
+    //if($.os.ios)
+        $.afui.animateHeader(true);
+
+    </script>
+   
+</head>
+
+<body>
+<div id="afui" class="">
+    <div class="view" id="mainview">
+        <header>
+        <a class="backButton" href="index.html#more" data-ignore="True" style="float:left"></a>
+        <a class="menuButton"  style="float:right" data-left-menu="leftMenu" onclick="$.afui.drawer.show('#left','left','reveal')"></a>
+        <h1 id="pageTitle">关于我们</h1>
+    	</header>
+        <!--内容------------------------------------------------------------------------------------------- -->
+        <div class="pages">
+            <div data-left-drawer="left" class="panel" id="piechart" style="padding:0px;" data-selected="true">
+              <br/><p><p>
+           		 <center>
+                      
+                      <img src="images/psb.jpg" height="300" width="100%">
+                      <p><p>
+                       <h2 style="font:Verdana, Geneva, sans-serif; color:#09F; font-weight:bold">&copy;福州大学信息检索题组</h2>
+      
+               </center>
+   			 </div>     
+        </div>
+        <!--侧边栏------------------------------------------------------------------------------------------- -->
+		<nav id="left"  style="z-index:5" data-include="partials/leftnav.html"></nav>
+        
+    </div>
+    </div>
+</body>
+
+</html>

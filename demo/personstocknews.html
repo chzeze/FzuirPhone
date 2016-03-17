@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>个股资讯</title>
+	<link rel="stylesheet" type="text/css" href="build/icons.css">
+	<link rel="stylesheet" type="text/css" href="build/af.ui.css">
+    <link rel="stylesheet" type="text/css" href="build/mystyle.css" />
+	<script type="text/javascript" src="js/libs/jquery.min.js"></script>
+	<script type="text/javascript" src="js/libs/iscroll-probe.js"></script>
+	<script type="text/javascript" src="js/libs/fastclick.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.shim.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.ui.js"></script>
+    <script src="src/af.desktopBrowsers.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.actionsheet.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.animation.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.touchEvents.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.popup.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.drawer.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.toast.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.animateheader.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.splashscreen.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.swipereveal.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.lockscreen.js"></script>
+	<script type="text/javascript">
+	$.afui.useOSThemes=false;
+    $.afui.loadDefaultHash=true;
+    $.afui.autoLaunch=false;
+    //check search
+    var search=document.location.search.toLowerCase().replace("?","");
+    if(search.length>0)
+    {
+
+       $.afui.useOSThemes=true;
+        if(search=="win8")
+            $.os.ie=true;
+        else if(search=="firefox")
+            $.os.fennec="true"
+        $.afui.ready(function(){
+            $(document.body).get(0).className=(search);
+        });
+    }
+	function selectsetion()
+	{		
+		$.ajax({
+			type: "post",  //以post方式与后台沟通
+			url : "php/personselectajax.php", //与此php页面沟通
+			dataType:'json',//从php返回的值以 JSON方式 解释    
+			success: function(json)
+			{	
+				for(var i=0;i<json['id'].length;i++){
+				$('#topics').append('<option style=\"color:black\" value="'+json['id'][i]+'">'+json['name'][i]+'</option>');
+				}
+			}
+			
+		});		
+	}
+	function loginstate()
+	{//登录状态验证
+		$.ajax({ //一个Ajax过程
+			type: "post",  //以post方式与后台沟通
+			url : "../Login/loginstate.php", //与此php页面沟通
+			dataType:'json',//从php返回的值以 JSON方式 解释   
+			success: function(json)
+			{
+				if(json.state==0){
+				alert('登录超时,请重新登录');
+				window.location.href='../login.html';
+				}
+			} 
+		});
+	}
+	 $(document).ready(function(){
+		 loginstate();
+        $.afui.launch();
+		selectsetion();
+    });
+		var items_per_page = 10;
+		var scroll_in_progress = false;
+		var myScroll;
+		load_content = function(refresh, next_page,tid,polar,field) {
+			$('#wrapper > #scroller > ul').data('tid', tid);
+			$('#wrapper > #scroller > ul').data('polar', polar);
+			$('#wrapper > #scroller > ul').data('field', field);
+			// This is a DEMO function which generates DEMO content into the scroller.
+			// Here you should place your AJAX request to fetch the relevant content (e.g. $.post(...))
+			console.log(refresh, next_page,tid,polar,field);
+			setTimeout(function() { // This immitates the CALLBACK of your AJAX function
+			//alert(tid+" "+polar+" "+field+" "+next_page);
+				if (!refresh) {
+					// Loading the initial content
+					//polar=0;
+					//alert(tid+" "+polar+" "+field);
+					$('#wrapper > #scroller > ul').html('');
+					$.ajax({ //一个Ajax过程
+					type: "post",  //以post方式与后台沟通
+					url : "php/personstockajax.php", //与此php页面沟通
+					dataType:'json',//从php返回的值以 JSON方式 解释   
+					data: 'tid='+tid+'&polar='+polar+'&field='+field+'&page=1', //发给php的请求数据   
+					success: function(json)
+					{	
+						//alert();
+						if(json==null)
+							$('#wrapper > #scroller > ul').append('<div style="height:auto; width:inherit; background-color:#999;"><p style=" text-align:center; color:#333;"><a class="icon bug big"></a>没有更多内容了</p></div>');
+						//alert(json['titles'].length);
+						for(var j=0;j<json['titles'].length;j++){
+						$('#wrapper > #scroller > ul')
+							.append('<li><div class="mycard"><span class="topicnames">主题名称:'+json['topicnames'][j]+'</span><span class="polars" id=card'+j+'>倾向性:'+json['polars'][j]+'</span><p><a href="detail.html?url='+json['url'][j]+'" data-ignore="true"><p>'+json['titles'][j]+'</p><p><span class="topicownername">所属用户:'+json['topicownername'][j]+'</span><span class="day">'+json['days'][j]+'</span></div></li>');
+						if(json['polars'][j]=="负面")document.getElementById("card"+j).style.color='#ff0000';
+						}
+						
+						if(json['titles'].length<10)
+						$('#wrapper > #scroller > ul').append('<div style="height:auto; width:inherit; background-color:#999;"><p style=" text-align:center; color:#333;"><a class="icon bug big"></a>没有更多内容了</p></div>');
+					}   
+				});
+				} else if (refresh && !next_page) {
+					// Refreshing the content
+					$('#wrapper > #scroller > ul').html('');
+					$.ajax({ //一个Ajax过程
+					type: "post",  //以post方式与后台沟通
+					url : "php/personstockajax.php", //与此php页面沟通
+					dataType:'json',//从php返回的值以 JSON方式 解释   
+					data: 'tid='+tid+'&polar='+polar+'&field='+field+'&page=1', //发给php的请求数据   
+					success: function(json)
+					{	
+						if(json==null)
+							$('#wrapper > #scroller > ul').append('<div style="height:auto; width:inherit; background-color:#999;"><p style=" text-align:center; color:#333;"><a class="icon bug big"></a>没有更多内容了</p></div>');
+						//alert('asd');
+						for(var j=0;j<json['titles'].length;j++){
+						$('#wrapper > #scroller > ul')
+							.append('<li><div class="mycard"><span class="topicnames">主题名称:'+json['topicnames'][j]+'</span><span class="polars" id=card'+j+'>倾向性:'+json['polars'][j]+'</span><p><a href="detail.html?url='+json['url'][j]+'" data-ignore="true"><p>'+json['titles'][j]+'</p><p><span class="topicownername">所属用户:'+json['topicownername'][j]+'</span><span class="day">'+json['days'][j]+'</span></div></li>');
+						if(json['polars'][j]=="负面")document.getElementById("card"+j).style.color='#ff0000';
+						}
+						if(json['title'].length<10)$('#wrapper > #scroller > ul').append('<div style="height:auto; width:inherit; background-color:#999;"><p style=" text-align:center; color:#333;"><a class="icon bug big"></a>没有更多内容了</p></div>');
+					}   
+				});
+				} else if (refresh && next_page) {
+					// Loading the next-page content and refreshing
+					
+					$.ajax({ //一个Ajax过程
+					type: "post",  //以post方式与后台沟通
+					url : "php/personstockajax.php", //与此php页面沟通
+					dataType:'json',//从php返回的值以 JSON方式 解释   
+					data: 'tid='+tid+'&polar='+polar+'&field='+field+'&page='+next_page, //发给php的请求数据   
+					success: function(json)
+					{	
+						if(json==null)
+							$('#wrapper > #scroller > ul').append('<div style="height:auto; width:inherit; background-color:#999;"><p style=" text-align:center; color:#333;"><a class="icon bug big"></a>没有更多内容了</p></div>');
+						//alert('asd');
+						for(var j=0;j<json['titles'].length;j++){
+						$('#wrapper > #scroller > ul')
+							.append('<li><div class="mycard"><span class="topicnames">主题名称:'+json['topicnames'][j]+'</span><span class="polars" id=card'+j+'>倾向性:'+json['polars'][j]+'</span><p><a href="detail.html?url='+json['url'][j]+'" data-ignore="true"><p>'+json['titles'][j]+'</p><p><span class="topicownername">所属用户:'+json['topicownername'][j]+'</span><span class="day">'+json['days'][j]+'</span></div></li>');
+						if(json['polars'][j]=="负面")document.getElementById("card"+next_page+j).style.color='#ff0000';
+						}
+						if(json['title'].length<10)$('#wrapper > #scroller > ul').append('<div style="height:auto; width:inherit; background-color:#999;"><p style=" text-align:center; color:#333;"><a class="icon bug big"></a>没有更多内容了</p></div>');
+					}   
+				});
+				}
+				if (refresh) {
+
+					myScroll.refresh();
+					pullActionCallback();
+
+				} else {
+					if (myScroll) {
+						myScroll.destroy();
+						$(myScroll.scroller).attr('style', ''); // Required since the styles applied by IScroll might conflict with transitions of parent layers.
+						myScroll = null;
+					}
+					trigger_myScroll();
+				}
+			}, 10);
+		};
+		function pullDownAction() {
+			var tid = $('#wrapper > #scroller > ul').data('tid');
+			var polar = $('#wrapper > #scroller > ul').data('polar');
+			var field = $('#wrapper > #scroller > ul').data('field');
+			load_content('refresh',0,tid,polar,field);
+			$('#wrapper > #scroller > ul').data('page', 1);
+			// Since "topOffset" is not supported with iscroll-5
+			$('#wrapper > .scroller').css({top:0});
+		}
+		function pullUpAction(callback) {
+			if ($('#wrapper > #scroller > ul').data('page')) {
+				var next_page = parseInt($('#wrapper > #scroller > ul').data('page'), 10) + 1;
+			} else {
+				var next_page = 2;
+			}
+			var tid = $('#wrapper > #scroller > ul').data('tid');
+			var polar = $('#wrapper > #scroller > ul').data('polar');
+			var field = $('#wrapper > #scroller > ul').data('field');
+			load_content('refresh', next_page,tid,polar,field);
+			$('#wrapper > #scroller > ul').data('page', next_page);
+			if (callback) {
+				callback();
+			}
+		}
+		function pullActionCallback() {
+			if (pullDownEl && pullDownEl.className.match('loading')) {
+				pullDownEl.className = 'pullDown';
+				pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Pull down to refresh';
+				myScroll.scrollTo(0, parseInt(pullUpOffset)*(-1), 60);
+			} else if (pullUpEl && pullUpEl.className.match('loading')) {
+				$('.pullUp').removeClass('loading').html('');
+
+			}
+		}
+		var pullActionDetect = {
+			count:0,
+			limit:10,
+			check:function(count) {
+				if (count) {
+					pullActionDetect.count = 0;
+				}
+				// Detects whether the momentum has stopped, and if it has reached the end - 200px of the scroller - it trigger the pullUpAction
+				setTimeout(function() {
+					if (myScroll.y <= (myScroll.maxScrollY + 60) && pullUpEl && !pullUpEl.className.match('loading')) {
+						$('.pullUp').addClass('loading').html('<span class="pullUpIcon">&nbsp;</span><span class="pullUpLabel">Loading...</span>');
+						pullUpAction();
+					} else if (pullActionDetect.count < pullActionDetect.limit) {
+						pullActionDetect.check();
+						pullActionDetect.count++;
+					}
+				}, 200);
+			}
+		}
+		
+		function trigger_myScroll(offset) {
+			pullDownEl = document.querySelector('#wrapper .pullDown');
+			if (pullDownEl) {
+				pullDownOffset = pullDownEl.offsetHeight;
+			} else {
+				pullDownOffset = 0;
+			}
+			pullUpEl = document.querySelector('#wrapper .pullUp');	
+			if (pullUpEl) {
+				pullUpOffset = pullUpEl.offsetHeight;
+			} else {
+				pullUpOffset = 0;
+			}
+			
+			if ($('#wrapper ul > li').length < items_per_page) {
+				// If we have only 1 page of result - we hide the pullup and pulldown indicators.
+				$('#wrapper .pullDown').hide();
+				$('#wrapper .pullUp span').hide();
+				offset = 0;
+			} else if (!offset) {
+				// If we have more than 1 page of results and offset is not manually defined - we set it to be the pullUpOffset.
+				offset = pullUpOffset;
+			}
+			
+			myScroll = new IScroll('#wrapper', {
+				probeType:1, tap:true, click:false, preventDefaultException:{tagName:/.*/}, mouseWheel:true, scrollbars:false, fadeScrollbars:false, interactiveScrollbars:false, keyBindings:false,
+				deceleration:0.0002,
+				startY:(parseInt(offset)*(-1))
+			});
+			
+			myScroll.on('scrollStart', function () {
+				scroll_in_progress = true;
+			});
+			myScroll.on('scroll', function () {
+				
+				scroll_in_progress = true;
+				
+				if ($('#wrapper ul > li').length >= items_per_page) {
+					if (this.y >= 5 && pullDownEl && !pullDownEl.className.match('flip')) {
+						pullDownEl.className = 'pullDown flip';
+						pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Release to refresh';
+						this.minScrollY = 0;
+					} else if (this.y <= 5 && pullDownEl && pullDownEl.className.match('flip')) {
+						pullDownEl.className = 'pullDown';
+						pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Pull down to refresh';
+						this.minScrollY = -pullDownOffset;
+					}
+					
+					console.log(this.y);
+					pullActionDetect.check(0);
+					
+				}
+			});
+			myScroll.on('scrollEnd', function () {
+				console.log('scroll ended');
+				setTimeout(function() {
+					scroll_in_progress = false;
+				}, 100);
+				if ($('#wrapper ul > li').length >= items_per_page) {
+					if (pullDownEl && pullDownEl.className.match('flip')) {
+						pullDownEl.className = 'pullDown loading';
+						pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Loading...';
+						pullDownAction();
+					}
+					// We let the momentum scroll finish, and if reached the end - loading the next page
+					pullActionDetect.check(0);
+				}
+			});
+			
+			// In order to prevent seeing the "pull down to refresh" before the iScoll is trigger - the wrapper is located at left:-9999px and returned to left:0 after the iScoll is initiated
+			setTimeout(function() {
+				$('#wrapper').css({left:0});
+			}, 100);
+		}
+
+		function loaded() {
+
+			load_content(null,0,-1,'',0);
+
+		}
+		document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+
+	</script>
+
+	<style type="text/css">
+* {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+html {
+	-ms-touch-action: none;
+}
+body, ul, li {
+	padding: 0;
+	margin: 0;
+	border: 0;
+}
+body {
+	font-size: 12px;
+	font-family: ubuntu, helvetica, arial;
+	overflow: hidden; /* this is important to prevent the whole page to bounce */
+}
+#wrapper {
+	position: absolute;
+	z-index: 1;
+	top: 50px;
+	bottom: 0px;
+	left: 9999px; /* Not a must - can be 0 - but it makes the appearance of the content a bit nicer */
+	width: 100%;
+	overflow: hidden;
+}
+#scroller {
+	position: absolute;
+	z-index: 1;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	width: 100%;
+	-webkit-transform: translateZ(0);
+	-moz-transform: translateZ(0);
+	-ms-transform: translateZ(0);
+	-o-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	-webkit-text-size-adjust: none;
+	-moz-text-size-adjust: none;
+	-ms-text-size-adjust: none;
+	-o-text-size-adjust: none;
+	text-size-adjust: none;
+}
+.pullDownLabel, .pullUpLabel {
+	color: #999
+}
+.pullDown, .pullUp {
+	background: #fff;
+	height: 40px;
+	line-height: 40px;
+	font-weight: bold;
+	font-size: 0.8em;
+	color: #888
+}
+.pullDown .pullDownIcon, .pullUp .pullUpIcon {
+	display: block;
+	float: left;
+	opacity: 0.4;
+	width: 40px;
+	height: 40px;
+	background: url(images/pull_to_refresh.png) 0 0 no-repeat;
+	-webkit-background-size: 40px 80px;
+	-ms-background-size: 40px 80px;
+	background-size: 40px 80px;
+	-webkit-transition-property: -webkit-transform;
+	-ms-transition-property: -webkit-transform;
+	-webkit-transition-duration: 250ms;
+	-ms-transition-duration: 250ms
+}
+.pullDown .pullDownIcon {
+	-webkit-transform: rotate(0deg) translateZ(0);
+	-ms-transform: rotate(0deg) translateZ(0)
+}
+.pullUp .pullUpIcon {
+	-webkit-transform: rotate(-180deg) translateZ(0);
+	-ms-transform: rotate(-180deg) translateZ(0)
+}
+.pullDown.flip .pullDownIcon {
+	-webkit-transform: rotate(-180deg) translateZ(0);
+	-ms-transform: rotate(-180deg) translateZ(0)
+}
+.pullUp.flip .pullUpIcon {
+	-webkit-transform: rotate(0deg) translateZ(0);
+	-ms-transform: rotate(0deg) translateZ(0)
+}
+.pullDown.loading .pullDownIcon, .pullUp.loading .pullUpIcon {
+	background-position: 0 100%;
+	-webkit-transform: rotate(0deg) translateZ(0);
+	-ms-transform: rotate(0deg) translateZ(0);
+	-webkit-transition-duration: 0ms;
+	-ms-transition-duration: 0ms;
+	-webkit-animation-name: loading;
+	-ms-animation-name: loading;
+	-webkit-animation-duration: 1s;
+	-ms-animation-duration: 1s;
+	-webkit-animation-iteration-count: infinite;
+	-ms-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: linear;
+	-ms-animation-timing-function: linear
+}
+ @-webkit-keyframes loading {
+ from {
+-webkit-transform:rotate(0deg) translateZ(0)
+}
+to {
+	-webkit-transform: rotate(360deg) translateZ(0)
+}
+}
+ @-ms-keyframes loading {
+ from {
+-ms-transform:rotate(0deg) translateZ(0)
+}
+to {
+	-ms-transform: rotate(360deg) translateZ(0)
+}
+}
+</style>
+</head>
+
+<body onload="loaded()">
+	<div class="view">
+        <header>
+           <a class="backButton" href="index.html" data-ignore="True" style="float:left"></a>
+        <a class="menuButton"  style="float:right" data-left-menu="leftMenu" onclick="$.afui.drawer.show('#left','left','reveal')"></a>
+        
+           <h1>个股资讯</h1>
+        </header>
+        <div class="pages">       
+        <!--Tab View Pages-->
+            <div id="main" class="panel" id="main" data-selected="true">
+            <div style="width:100%;height:100%;z-index:20000;position:absolute;margin:0px 15%;text-align:center; vertical-align:middle;">
+            <table style="margin-bottom:0px; color:black;">
+          <tr style="margin-bottom:0px; color:black;">
+          <td align="center" style="margin-bottom:0px; color:black;">
+            <SELECT id="topics" onchange=onSelect() style="font-weight:bold;">
+    	</SELECT>
+        </td>
+         <td>
+        <select id="orderPolar" onchange="onSelect()" style="font-weight:bold;">
+                  <option style="color:black;" selected="selected" value="">全部</option>
+                  <option style="color:black" value="0">客观</option>
+                  <option style="color:black" value="1">正面</option>
+                  <option style="color:black" value="-1">负面</option>
+                </select>
+      </td>
+       <td>
+     <select id="field" onchange="onSelect()" style="font-weight:bold;">
+                  <option style="color:black" selected="selected" value="0">全部</option>
+                  <option style="color:black" value="1">门户网站</option>
+                  <option style="color:black" value="2">股吧</option>
+                  <option style="color:black" value="3">微博</option>
+                  <option style="color:black" value="4">微信</option>
+                </select>
+      </td></tr>
+      </table>
+            </div>
+            <div id="myTopBtn" onclick="myScroll.scrollTo(0,0);"></div>
+            	<div id="wrapper" style="z-index:-1;">
+					<div id="scroller">
+						<div class="pullDown">
+							<span class="pullDownIcon">&nbsp;</span>
+							<span class="pullDownLabel">下拉加载更多...</span>
+						</div>
+						<ul></ul>
+						<div class="pullUp"></div>
+					</div>
+				</div>
+            </div>
+        </div>
+        <nav id="left"  style="z-index:5" data-include="partials/leftnav.html"></nav>
+    </div>
+    
+<script type="text/javascript">
+  
+    function onSelect(){
+		var tid=document.getElementById("topics").value;
+		var polar=document.getElementById("orderPolar").value;
+		var field=document.getElementById("field").value;
+		//alert(tid+" "+polar+" "+field);	
+		var url;
+		if(tid!=null&&polar!=null&&field!=null){
+		    load_content(null,0,tid,polar,field);
+		}
+		else{
+		  alert(tid+polar+field);
+		}
+}
+	  
+</script>
+</body>
+</html>

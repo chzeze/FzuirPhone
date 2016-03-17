@@ -1,0 +1,127 @@
+.mycard {
+  padding: 0.7rem 0.3rem 0.8rem;
+  box-shadow: 0 1px 4px #aaa;
+  background:transparent none no-repeat scroll 50% 0;
+  background-image:url(../1.png);
+  background-size:100% 100%;     
+  color: inherit;
+  margin: 0 0.3rem 1rem;
+  border-radius: 3px;
+  -webkit-user-select: none;
+  position: relative;
+}
+.mycard h1 {
+  font-family: '宋体';
+  font-size: 10px;
+  font-weight: 200;
+  font-weight:bold;
+  float:left;
+  color:#F90;
+}
+.mycard h3 {
+    font-family: '宋体';
+  font-size: 10px;
+  font-weight: 200;
+  font-weight:bold;
+  float:right;
+  color:#F90;
+}
+.mycard h2 {
+  font-size:5px;
+  line-height: 2.5;
+  color: #000;
+  font-weight: 400;
+}
+.mycard p {
+  margin: 0px;
+  padding: 10px;
+}
+.mycard a{
+  color:#000;
+  text-decoration:none;
+  margin: 0px;
+  padding: 10px;
+  font-family: '宋体';
+}
+
+.mycard span.title{
+  font-family: '宋体';
+  font-size: 10px;
+  float:left;
+  color:#000;
+ }
+
+.mycard span.topicnames{
+  font-family: '宋体';
+  font-size: 12px;
+  line-height:10px;
+  float:left;
+  font-weight:bold;
+  color:#63C;
+ }
+ 
+ .mycard span.polars{
+  font-family: '宋体';
+  font-size: 12px;
+  line-height:10px;
+  float:right;
+  color:#000;
+  font-weight:bold;
+ }
+ 
+ .mycard span.day{
+  font-family: '宋体';
+  font-size: 10px;
+  
+  float:right;
+  color:#666;
+ }
+ 
+ .mycard span.topicownername{
+  font-family: '宋体';
+  font-size: 10px;
+  
+  float:left;
+  color:#666;
+ }
+
+#wrapper  #scroller  ul .mycard {
+  padding:1rem 0.5rem 1.3rem;
+  box-shadow: 0 1px 4px #aaa;
+  background:transparent none no-repeat scroll 50% 0;
+  background-image:url(../1.png);
+  background-position:left top;
+  background-size:100% 4rem;     
+  color: inherit;
+  margin: 0 0.3rem 0.8rem;
+  border-radius: 3px;
+  -webkit-user-select: none;
+  position: relative;
+}
+
+#myTopBtn{
+        bottom: 60px;
+        right: 5px;
+        position:fixed;
+		width: 30px;
+		height:30px;
+		z-index:20000;
+		background-image:url(../images/top.png);
+		background-size:100% 100%;
+		color:#00000000;
+    }
+	
+#myexit{
+        top: 60px;
+        right: 5px;
+        position:fixed;
+		width: 30px;
+		height:30px;
+		z-index:20000;
+		background-image:url(../images/exit.png);
+		background-size:100% 100%;
+		color:#00000000;
+    }
+
+
+

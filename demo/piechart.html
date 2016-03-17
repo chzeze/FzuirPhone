@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+<!--HTML5 doctype-->
+<html>
+
+<head>
+
+    <title>互联网信息服务平台</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, minimal-ui">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="stylesheet" type="text/css" href="build/icons.css" />
+    <link rel="stylesheet" type="text/css" href="build/af.ui.css" />
+    <link rel="stylesheet" type="text/css" href="build/mystyle.css" />
+    
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+	<noscript><link rel="stylesheet" type="text/css" href="css/noJS.css" /></noscript>
+    
+     <script type="text/javascript" charset="utf-8" src="js/libs/jquery.min.js"></script>
+    	<script type="text/javascript" src="js/libs/iscroll-probe.js"></script>
+	<script type="text/javascript" src="js/libs/fastclick.js"></script>
+    <!--<script type="text/javascript" src="build/appframework.ui.js"></script>-->
+    <script type="text/javascript" charset="utf-8" src="src/af.shim.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.ui.js"></script>
+    <script src="src/af.desktopBrowsers.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.actionsheet.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.animation.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.touchEvents.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.popup.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.drawer.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.toast.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.animateheader.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.splashscreen.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.swipereveal.js"></script>
+    <script type="text/javascript" charset="utf-8" src="src/af.lockscreen.js"></script>
+    
+    <script>
+    $.afui.useOSThemes=false;
+    $.afui.loadDefaultHash=true;
+    $.afui.autoLaunch=false;
+
+    //check search
+    var search=document.location.search.toLowerCase().replace("?","");
+    if(search.length>0)
+    {
+
+       $.afui.useOSThemes=true;
+        if(search=="win8")
+            $.os.ie=true;
+        else if(search=="firefox")
+            $.os.fennec="true"
+        $.afui.ready(function(){
+            $(document.body).get(0).className=(search);
+        });
+    }
+
+    $(document).ready(function(){
+       
+		
+		$.ajax({
+			type: "post",  //以post方式与后台沟通
+			url : "php/pieajax.php", //与此php页面沟通
+			dataType:'json',//从php返回的值以 JSON方式 解释     
+			success: function(json)
+			{
+				for(var i=0;i<json['id'].length;i++)
+				{
+				 $(".dropdown").append('<li><a href=\"#\" onclick="getChart('+(i+1)+',\''+json['topicname'][i]+'\');" value="'+json['id'][i]+'">'+json['topicname'][i]+'</a></li>');
+				//alert('<li><a href=\"#\" value="'+json['id'][i]+'">'+json['topicname'][i]+'</a></li>');
+				}
+			}
+			
+			});
+			 $.afui.launch();
+    });
+
+    //if($.os.ios)
+        $.afui.animateHeader(true);
+
+    </script>
+    
+    <script type="text/javascript">
+	$(function () {
+		var index;
+		getChart(0,'全部主题');
+		});
+
+	/**
+	 * 构造饼图
+	 * @param topic: 主题名称
+	 */
+			function getChart(index,topic) {
+				$.ajax({ //一个Ajax过程
+					type: "post",  //以post方式与后台沟通
+					url : "php/pieajax.php", //与此php页面沟通
+					dataType:'json',//从php返回的值以 JSON方式 解释   
+					data: 'idindex='+index, //发给php的请求数据   
+					success: function(json)
+					{
+							//alert("tid : "+json.index);
+			
+							var datas='[';
+							for(var j=0;j<5;j++)
+							{
+								datas+="['"+json['name'][j]+":"+json['num'][j]+"条',"+json['num'][j]+"],";
+							}
+							datas+=']';
+							var ans=eval(datas);
+							//alert(ans);
+							var chart = new Highcharts.Chart({
+							chart: {
+								renderTo: 'pie_container',
+								type: 'pie',
+								backgroundColor: 'rgba(255, 255, 255, 0)',
+								options3d: {
+									enabled: true,
+									alpha: 45,
+									beta: 0
+								}
+							},
+							title: {
+								text: topic
+							},
+							tooltip: {
+								pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+							},
+							plotOptions: {
+								pie: {
+									allowPointSelect: true,
+									cursor: 'pointer',
+									depth: 35,
+									dataLabels: {
+										enabled: true,
+										format: '{point.name}'
+									}
+								}
+							},
+							series: [{
+								type: 'pie',
+								name: 'Browser share',
+								data: ans
+							}]
+						});
+						
+					}   
+				});
+			};
+
+</script>
+   
+</head>
+
+<body>
+<div id="afui" class="">
+    <div class="view" id="mainview">
+        <header>
+        <a class="backButton" href="../demo/index.html" data-ignore="True" style="float:left" style="text-decoration:none"></a>
+        <a class="menuButton"  style="float:right" data-left-menu="leftMenu" onclick="$.afui.drawer.show('#left','left','reveal')"></a>
+        <h1 id="pageTitle">数据来源统计</h1>
+    	</header>
+        <!--内容------------------------------------------------------------------------------------------- -->
+        <div class="pages">
+            <div data-left-drawer="left" class="panel" id="piechart"  data-selected="true">
+            		<section class="select-main">
+		<div class="wrapper-demo">
+			<div id="dd" class="wrapper-dropdown-1" tabindex="1">
+				<span>选择主题</span>
+				<ul class="dropdown" tabindex="1">
+               		<li><a href=\"#\">全部主题</a></li>
+				</ul>
+			</div>
+			​</div>
+	</section>
+
+	<script src="js/highcharts.js"></script>
+	<script src="js/highcharts-3d.js"></script>
+
+	<div>
+	 	<div id="pie_container" style="width:100%"></div>
+	</div>
+            
+           	
+   			 </div>     
+        </div>
+        <!--侧边栏------------------------------------------------------------------------------------------- -->
+		<nav id="left"  style="z-index:5" data-include="partials/leftnav.html"></nav>
+        
+    </div>
+    </div>
+    
+    <script type="text/javascript">
+	function selectclick(index2,indeid){
+		getChart(index2,indeid);
+	}
+	function DropDown(el) {
+		this.dd = el;
+		this.placeholder = this.dd.children('span');
+		this.opts = this.dd.find('ul.dropdown > li');
+		this.val = '';
+		this.index = -1;
+		this.initEvents();
+	}
+	DropDown.prototype = {
+		initEvents : function() {
+			var obj = this;
+
+			obj.dd.on('click', function(event){
+				$(this).toggleClass('active');
+				return false;
+			});
+
+			obj.opts.on('click',function(){
+				var opt = $(this);
+				obj.val = opt.text();
+				obj.index = opt.index();
+				obj.placeholder.text('选择主题: ' + obj.val);
+				//alert(obj.index);
+				getChart(obj.index,obj.val);
+			});
+		},
+		getValue : function() {
+			return this.val;
+		},
+		getIndex : function() {
+			return this.index;
+		}
+	}
+
+	$(function() {
+
+		var dd = new DropDown( $('#dd') );
+
+		$(document).click(function() {
+			// all dropdowns
+			$('.wrapper-dropdown-1').removeClass('active');
+		});
+
+	});
+
+</script>
+</body>
+
+</html>
